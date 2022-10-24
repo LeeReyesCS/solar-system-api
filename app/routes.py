@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, abort, make_response
 
 
 class Planet:
@@ -8,7 +8,7 @@ class Planet:
         self.description = description
         self.num_moons = num_moons
 
-planets = [
+PLANETS = [
     Planet(1, "Mercury", "Closest to the Sun", 0),
     Planet(2, "Venus", "The Planet of Love", 0),
     Planet(3, "Earth", "The Planet of Life", 1),
@@ -23,5 +23,27 @@ planet_bp = Blueprint("planet",__name__,url_prefix="/planets")
 
 @planet_bp.route("", methods=["GET"])
 def handle_planets():
-    planet_response = [vars(planet) for planet in planets]
+    planet_response = [vars(planet) for planet in PLANETS]
     return jsonify(planet_response)
+
+# read one planet
+@planet_bp.route('/<id>', methods=["GET"])
+def get_one_planet(id):
+    planet = validate_planet(id)
+    return planet
+
+def validate_planet(id):
+    try:
+        planet_id = int(id)
+    except ValueError:
+        return {
+            "message": "Invalid planet id"
+        }, 400
+        
+    for planet in PLANETS:
+        if planet.id == planet_id:
+            return vars(planet)
+        
+    abort(make_response(jsonify(description="Resource not found"), 404))
+
+

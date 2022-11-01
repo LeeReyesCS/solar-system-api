@@ -93,7 +93,7 @@ def update_one_planet(id):
 
 ## delete planet
 @planet_bp.route("/<id>", methods=["DELETE"])
-def delete_plant(id):
+def delete_planet(id):
     planet = validate_planet(id) # call helper fx   
     
     db.session.delete(planet)

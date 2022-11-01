@@ -3,7 +3,7 @@ from app.models.planet import Planet
 from flask import Blueprint, jsonify, abort, make_response, request
 
 planet_bp = Blueprint("planet",__name__,url_prefix="/planets")
-
+#
 @planet_bp.route("", methods=["GET","POST"])
 def handle_planets():
     if request.method == "GET":

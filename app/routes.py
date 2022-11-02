@@ -9,6 +9,18 @@ planet_bp = Blueprint("planet",__name__,url_prefix="/planets")
 def handle_planets():
     if request.method == "GET":
         planets = Planet.query.all()
+        planet_query = Planet.query
+
+        name_query = request.args.get("name")
+        if name_query:
+            planet_query = planet_query.filter(Planet.name.ilike(f'%{name_query}%'))
+
+        num_moons_query = request.args.get("num_moons")
+        if num_moons_query:
+            planet_query = planet_query.filter_by(num_moons = num_moons_query)
+
+        planets = planet_query.all()
+
         planets_response = []
         for planet in planets:
             planets_response.append({
@@ -17,6 +29,8 @@ def handle_planets():
                 "description": planet.description,
                 "num_moons": planet.num_moons
             })
+        if not planets_response:
+            return make_response(jsonify(f"There are no {name_query} planets"))
             
         return jsonify(planets_response)
     

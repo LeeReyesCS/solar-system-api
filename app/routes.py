@@ -4,44 +4,45 @@ from flask import Blueprint, jsonify, abort, make_response, request
 
 planet_bp = Blueprint("planet",__name__,url_prefix="/planets")
 
-## Getting all planets and creating one planet
-@planet_bp.route("", methods=["GET","POST"])
+## Getting all planets a
+@planet_bp.route("", methods=["GET"])
 def handle_planets():
-    if request.method == "GET":
-        planets = Planet.query.all()
-        planet_query = Planet.query
+    planets = Planet.query.all()
+    planet_query = Planet.query
 
-        name_query = request.args.get("name")
-        if name_query:
-            planet_query = planet_query.filter(Planet.name.ilike(f'%{name_query}%'))
+    name_query = request.args.get("name")
+    if name_query:
+        planet_query = planet_query.filter(Planet.name.ilike(f'%{name_query}%'))
 
-        num_moons_query = request.args.get("num_moons")
-        if num_moons_query:
-            planet_query = planet_query.filter_by(num_moons = num_moons_query)
+    num_moons_query = request.args.get("num_moons")
+    if num_moons_query:
+        planet_query = planet_query.filter_by(num_moons = num_moons_query)
 
-        planets = planet_query.all()
+    planets = planet_query.all()
 
-        planets_response = []
-        for planet in planets:
-            planets_response.append({
-                "id": planet.id,
-                "name": planet.name,
-                "description": planet.description,
-                "num_moons": planet.num_moons
-            })
-        if not planets_response:
-            return make_response(jsonify(f"There are no {name_query} planets"))
-            
-        return jsonify(planets_response)
-    
-    elif request.method == "POST":
-        request_body = request.get_json()
-        new_planet = Planet(name=request_body["name"],
-                            description=request_body["description"],
-                            num_moons=request_body["num_moons"])
-    
-        db.session.add(new_planet)
-        db.session.commit()
+    planets_response = []
+    for planet in planets:
+        planets_response.append({
+            "id": planet.id,
+            "name": planet.name,
+            "description": planet.description,
+            "num_moons": planet.num_moons
+        })
+    if not planets_response:
+        return make_response(jsonify(f"There are no {name_query} planets"))
+        
+    return jsonify(planets_response)
+
+## creating one planet    
+@planet_bp.route("", methods=["POST"])    
+def create_planet():
+    request_body = request.get_json()
+    new_planet = Planet(name=request_body["name"],
+                        description=request_body["description"],
+                        num_moons=request_body["num_moons"])
+
+    db.session.add(new_planet)
+    db.session.commit()
     
     return make_response(f"Planet {new_planet.name} successfully created", 201)
 

@@ -28,6 +28,7 @@ def handle_planets():
             "description": planet.description,
             "num_moons": planet.num_moons
         })
+    # if we uncomment lines 32, 33 - test 1 passes
     if not planets_response:
         return make_response(jsonify(f"There are no {name_query} planets"))
         
@@ -44,7 +45,7 @@ def create_planet():
     db.session.add(new_planet)
     db.session.commit()
     
-    return make_response(f"Planet {new_planet.name} successfully created", 201)
+    return make_response(jsonify(f"Planet {new_planet.name} successfully created", 201))
 
 # helper fx
 def validate_planet(id):
